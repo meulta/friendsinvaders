@@ -1,9 +1,9 @@
 var webpack = require('webpack');
 
 module.exports = {
-    entry: "./web/index.ts",
+    entry: "./web/app.ts",
     output: {
-        filename: "./web/index.js",
+        filename: "./web/app.js",
     },
     // Enable sourcemaps for debugging webpack's output.
     devtool: "source-map",

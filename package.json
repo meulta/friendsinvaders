@@ -12,7 +12,12 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    "@types/promise": "^7.1.30",
+    "@types/superagent": "^3.5.5",
+    "Promise": "^1.0.5",
+    "superagent": "^3.6.0"
+  },
   "devDependencies": {
     "@types/node": "^8.0.19",
     "awesome-typescript-loader": "^3.2.2",
