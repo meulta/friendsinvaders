@@ -5,7 +5,7 @@ import { Config } from './config'
 export class FaceApi {
     static baseUrl: string = 'https://westus.api.cognitive.microsoft.com/face/v1.0/detect';
 
-    static async detect(image: Binary | string): Promise<FaceResult> {
+    static async detect(image: Binary | string): Promise<FaceResult[]> {
         // determine if the image is a URL or raw data
         const binary = image.constructor !== String;
 

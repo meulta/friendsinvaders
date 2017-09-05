@@ -17,17 +17,17 @@ declare global {
 
 import { FaceApi } from './faceApi'
 import { denodeify } from 'promise'
+import { Game } from './game/game'
 
 export class App {
 
     private streaming: boolean = false;
     private video: HTMLVideoElement = document.querySelector('#video') as HTMLVideoElement;
-    private cover: HTMLElement = document.querySelector('#cover') as HTMLElement;
     private canvas: HTMLCanvasElement = document.querySelector('#canvas') as HTMLCanvasElement;
     private debug: HTMLParagraphElement = document.querySelector('#debug') as HTMLParagraphElement;
-    private startbutton: HTMLButtonElement = document.querySelector('#startbutton') as HTMLButtonElement;
     private width: number = 320;
     private height: number = 0;
+    private game: Game;
 
     constructor() {
         navigator.getMedia = (navigator.getUserMedia ||
@@ -35,7 +35,7 @@ export class App {
             navigator.mozGetUserMedia ||
             navigator.msGetUserMedia);
 
-        navigator.getMedia(
+        var toto = navigator.getMedia(
             {
                 video: true,
                 audio: false
@@ -62,14 +62,14 @@ export class App {
                 this.canvas.setAttribute('width', this.width.toString());
                 this.canvas.setAttribute('height', this.height.toString());
                 this.streaming = true;
+                this.takepicture();
             }
         }, false);
 
-        this.startbutton.addEventListener('click', (ev) => {
-            this.takepicture();
-            ev.preventDefault();
-        }, false);
-
+        window.addEventListener('DOMContentLoaded', () => {
+            this.game = new Game(document.getElementById('renderCanvas') as HTMLCanvasElement);
+            this.game.start();
+        });
     }
 
     private async takepicture() {
@@ -86,10 +86,11 @@ export class App {
             this.debug.innerText = 'No face detected';
         }
     }
+
     async toBlob(canvas: HTMLCanvasElement): Promise<Blob> {
         return new Promise<Blob>(
-            function (resolve) {
-                canvas.toBlob(function (blob) {
+            (resolve) => {
+                canvas.toBlob((blob) => {
                     resolve(blob);
                 }, 'image/png');
             });
