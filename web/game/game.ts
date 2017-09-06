@@ -1,22 +1,32 @@
 import * as BABYLON from 'babylonjs'
+import { HeadController } from './headController'
 
 export class Game {
 
     private engine: BABYLON.Engine;
     private scene: BABYLON.Scene;
     private canvas: HTMLCanvasElement;
+    private controller: HeadController;
 
-    constructor(canvas: HTMLCanvasElement) {
+    constructor(canvas: HTMLCanvasElement, controller: HeadController) {
         this.canvas = canvas;
+        this.controller = controller;
         this.engine = new BABYLON.Engine(this.canvas, true);
         this.createScene();
         this.initGameVisuals();
     }
 
-    public start(){
+    public start() {
+        this.controller.start();
+        
         this.engine.runRenderLoop(() => {
             this.scene.render();
         });
+    }
+
+    public stop() {
+        this.controller.stop();
+        this.engine.stopRenderLoop();
     }
 
     private createScene() {
