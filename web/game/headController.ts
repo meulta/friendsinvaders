@@ -15,7 +15,7 @@ declare global {
     }
 }
 
-import { FaceAttributes } from '../types'
+import { FaceAttributes, Action, Direction } from '../types'
 import { FaceApi } from '../faceApi'
 
 export class HeadController {
@@ -25,14 +25,26 @@ export class HeadController {
     private debug: HTMLParagraphElement;
     private width: number = 320;
     private height: number = 0;
-    private pollingFrequencyInSec: number = 5;
+    private pollingFrequencyInSec: number = 1;
     private streaming: boolean = false;
     private running: boolean = false;
+
+    private _direction: Direction;
+    public get direction(): Direction {
+        return this._direction;
+    }
+
+    private _action: Action;
+    public get action(): Action {
+        return this._action;
+    }
 
     constructor(video: HTMLVideoElement, tempCanvas: HTMLCanvasElement, debug: HTMLParagraphElement) {
         this.video = video;
         this.tempCanvas = tempCanvas;
         this.debug = debug;
+        this._action = Action.None;
+        this._direction = Direction.None;
         this.init();
     }
 
@@ -45,9 +57,37 @@ export class HeadController {
         this.running = false;
     }
 
-    private headTracker(): void {
+    private async headTracker(): Promise<void> {
         if (this.running) {
-            this.getFaceAttributes();
+
+            var faceAttr = await this.getFaceAttributes();
+            if (faceAttr) {
+
+                var roll = faceAttr.headPose.roll;
+                var happiness = faceAttr.emotion.happiness;
+                var anger = faceAttr.emotion.anger;
+
+                if (roll > 5) {
+                    this._direction = Direction.Left;
+                }
+                else if (roll < -5) {
+                    this._direction = Direction.Right;
+                }
+                else {
+                    this._direction = Direction.None;
+                }
+
+                if (happiness > 0.5 && happiness > anger) {
+                    this._action = Action.Heal;
+                }
+                else if (happiness > 0.5 && happiness > anger) {
+                    this._action = Action.Heal;
+                }
+                else {
+                    this._action = Action.None;
+                }
+            }
+
             setTimeout(() => { this.headTracker(); }, this.pollingFrequencyInSec * 1000);
         }
     }
@@ -55,17 +95,21 @@ export class HeadController {
     private async getFaceAttributes(): Promise<FaceAttributes> {
         this.tempCanvas.width = this.width;
         this.tempCanvas.height = this.height;
-        this.tempCanvas.getContext('2d').drawImage(this.video, 0, 0, this.width, this.height);
-        var faceResult = await FaceApi.detect(await this.toBlob(this.tempCanvas));
 
-        if (faceResult.length > 0) {
-            var attr = faceResult[0].faceAttributes;
-            this.debug.innerText = `Pitch: ${attr.headPose.pitch}, Roll: ${attr.headPose.roll}, Yaw: ${attr.headPose.yaw}, Anger: ${attr.emotion.anger}, Happiness: ${attr.emotion.happiness}, Neutral: ${attr.emotion.neutral}, Smile: ${attr.smile}, Age: ${attr.age}`;
-            return attr;
-        }
+        return new Promise<FaceAttributes>(
+            async (resolve) => {
+                this.tempCanvas.getContext('2d').drawImage(this.video, 0, 0, this.width, this.height);
+                var faceResult = await FaceApi.detect(await this.toBlob(this.tempCanvas));
 
-        this.debug.innerText = 'No face detected';
-        return null;
+                if (faceResult.length > 0) {
+                    var attr = faceResult[0].faceAttributes;
+                    this.debug.innerText = `Pitch: ${attr.headPose.pitch}, Roll: ${attr.headPose.roll}, Yaw: ${attr.headPose.yaw}, Anger: ${attr.emotion.anger}, Happiness: ${attr.emotion.happiness}, Neutral: ${attr.emotion.neutral}, Smile: ${attr.smile}, Age: ${attr.age}`;
+                    resolve(attr);
+                } else {
+                    this.debug.innerText = 'No face detected';
+                    resolve(null);
+                }
+            });
     }
 
     private init() {

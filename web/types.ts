@@ -7,6 +7,18 @@ export interface FaceResult {
     faceAttributes: FaceAttributes
 }
 
+export enum Direction {
+    Left,
+    Right,
+    None
+}
+
+export enum Action {
+    Shoot,
+    Heal,
+    None
+}
+
 export type Binary = Blob | Buffer
 
 export interface Config {

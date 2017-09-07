@@ -1,5 +1,6 @@
 import * as BABYLON from 'babylonjs'
 import { HeadController } from './headController'
+import { Direction, Action } from '../types'
 
 export class Game {
 
@@ -7,6 +8,7 @@ export class Game {
     private scene: BABYLON.Scene;
     private canvas: HTMLCanvasElement;
     private controller: HeadController;
+    private spaceship: BABYLON.Mesh;
 
     constructor(canvas: HTMLCanvasElement, controller: HeadController) {
         this.canvas = canvas;
@@ -20,6 +22,15 @@ export class Game {
         this.controller.start();
         
         this.engine.runRenderLoop(() => {
+            switch(this.controller.direction){
+                case Direction.Left:
+                    this.spaceship.position.x -= 0.02;
+                break;
+                case Direction.Right:
+                    this.spaceship.position.x += 0.02;
+                    break;
+            }
+
             this.scene.render();
         });
     }
@@ -45,10 +56,10 @@ export class Game {
 
     private initGameVisuals() {
         // create a built-in "sphere" shape; its constructor takes 4 params: name, subdivisions, radius, scene
-        var sphere = BABYLON.Mesh.CreateSphere('sphere1', 16, 2, this.scene);
+        this.spaceship = BABYLON.Mesh.CreateSphere('sphere1', 16, 2, this.scene);
 
         // move the sphere upward 1/2 of its height
-        sphere.position.y = 1;
+        this.spaceship.position.y = 1;
 
         // create a built-in "ground" shape; its constructor takes 5 params: name, width, height, subdivisions and scene
         var ground = BABYLON.Mesh.CreateGround('ground1', 6, 6, 2, this.scene);
