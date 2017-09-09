@@ -25,7 +25,7 @@ export class HeadController {
     private debug: HTMLParagraphElement;
     private width: number = 320;
     private height: number = 0;
-    private pollingFrequencyInSec: number = 1;
+    private pollingFrequencyInSec: number = 0.5;
     private streaming: boolean = false;
     private running: boolean = false;
 
@@ -59,7 +59,6 @@ export class HeadController {
 
     private async headTracker(): Promise<void> {
         if (this.running) {
-
             var faceAttr = await this.getFaceAttributes();
             if (faceAttr) {
 
@@ -87,7 +86,6 @@ export class HeadController {
                     this._action = Action.None;
                 }
             }
-
             setTimeout(() => { this.headTracker(); }, this.pollingFrequencyInSec * 1000);
         }
     }
