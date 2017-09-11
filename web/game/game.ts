@@ -1,6 +1,8 @@
 import * as BABYLON from 'babylonjs'
 import { HeadController } from './headController'
 import { Direction, Action } from '../types'
+import { Enemy } from './enemy'
+import { Bullet } from './bullet'
 
 export class Game {
 
@@ -11,18 +13,24 @@ export class Game {
     private spaceship: BABYLON.Mesh;
     private running: boolean;
     private spacePT: any
+    private enemies: Enemy[] = [];
+    private bullets: Bullet[] = [];
+    private upLeftCorner: BABYLON.Vector2;
+    private downRightCorner: BABYLON.Vector2;
 
     constructor(canvas: HTMLCanvasElement, controller: HeadController) {
         this.canvas = canvas;
         this.controller = controller;
         this.engine = new BABYLON.Engine(this.canvas, true);
+        this.upLeftCorner = new BABYLON.Vector2(-28, 30);
+        this.downRightCorner = new BABYLON.Vector2(28, 10);
         this.createScene();
         this.initGameVisuals();
         this.startRendering();
     }
 
     public start(): void {
-        this.controller.start();
+        //this.controller.start();
         this.running = true;
     }
 
@@ -42,8 +50,19 @@ export class Game {
                         this.spaceship.position.x += 0.1;
                         break;
                 }
+
+                this.enemies.forEach((enemy: Enemy) => {
+                    enemy.move();
+                    var bullet = enemy.tryShoot();
+                    if (bullet != null) {
+                        this.bullets.push(bullet);
+                    }
+                });
+
+                this.bullets.forEach((bullet: Bullet) => {
+                    bullet.move();
+                });
             }
-            this.spacePT.time+= 0.2;
             this.scene.render();
         });
     }
@@ -64,17 +83,17 @@ export class Game {
 
     private initGameVisuals() {
         //background
-        var spacebackground = BABYLON.Mesh.CreatePlane("spacebackground", 130, this.scene);
+        var spacebackground = BABYLON.Mesh.CreatePlane("spacebackground", 300, this.scene);
         spacebackground.material = new BABYLON.StandardMaterial("spacematerial", this.scene);
-        this.spacePT = new (<any>BABYLON).StarfieldProceduralTexture("spacebackgroundPT", 300, this.scene);
+        this.spacePT = new (<any>BABYLON).StarfieldProceduralTexture("spacebackgroundPT", 2048, this.scene);
         (<BABYLON.StandardMaterial>spacebackground.material).diffuseTexture = this.spacePT;
+        this.spacePT.refreshRate = 0;
+        this.spacePT.time = Math.random() * 1000;
         spacebackground.position.z = 40;
 
-        //spacebackground.rotate(new BABYLON.Vector3(1, 0, 0), Math.PI);
-
-        // create a built-in "sphere" shape; its constructor takes 4 params: name, subdivisions, radius, scene
-        var enemy = BABYLON.Mesh.CreateSphere('sphere1', 16, 3, this.scene);
-        enemy.position.y = 15;
+        while (this.enemies.length < 5) {
+            this.enemies.push(new Enemy(this.scene, this.upLeftCorner, this.downRightCorner));
+        }
 
         // create a built-in "ground" shape; its constructor takes 5 params: name, width, height, subdivisions and scene
         this.spaceship = BABYLON.Mesh.CreateBox("PlayerSpaceShip", 3, this.scene);
