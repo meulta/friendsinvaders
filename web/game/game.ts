@@ -3,6 +3,7 @@ import { HeadController } from './headController'
 import { Direction, Action } from '../types'
 import { Enemy } from './enemy'
 import { Bullet } from './bullet'
+import { SpaceShip } from './spaceship'
 
 export class Game {
 
@@ -10,7 +11,7 @@ export class Game {
     private scene: BABYLON.Scene;
     private canvas: HTMLCanvasElement;
     private controller: HeadController;
-    private spaceship: BABYLON.Mesh;
+    private spaceship: SpaceShip;
     private running: boolean;
     private spacePT: any
     private enemies: Enemy[] = [];
@@ -30,7 +31,7 @@ export class Game {
     }
 
     public start(): void {
-        //this.controller.start();
+        this.controller.start();
         this.running = true;
     }
 
@@ -42,15 +43,16 @@ export class Game {
     public startRendering(): void {
         this.engine.runRenderLoop(() => {
             if (this.running) {
-                switch (this.controller.direction) {
-                    case Direction.Left:
-                        this.spaceship.position.x -= 0.1;
-                        break;
-                    case Direction.Right:
-                        this.spaceship.position.x += 0.1;
-                        break;
+                this.spaceship.direction = this.controller.direction;
+                this.spaceship.action = this.controller.action;
+                this.spaceship.move();
+                
+                var bullet = this.spaceship.tryShoot();
+                if (bullet != null) {
+                    this.bullets.push(bullet);
                 }
-
+                this.spaceship.tryShoot();
+                
                 this.enemies.forEach((enemy: Enemy) => {
                     enemy.move();
                     var bullet = enemy.tryShoot();
@@ -82,6 +84,7 @@ export class Game {
     }
 
     private initGameVisuals() {
+
         //background
         var spacebackground = BABYLON.Mesh.CreatePlane("spacebackground", 300, this.scene);
         spacebackground.material = new BABYLON.StandardMaterial("spacematerial", this.scene);
@@ -95,8 +98,6 @@ export class Game {
             this.enemies.push(new Enemy(this.scene, this.upLeftCorner, this.downRightCorner));
         }
 
-        // create a built-in "ground" shape; its constructor takes 5 params: name, width, height, subdivisions and scene
-        this.spaceship = BABYLON.Mesh.CreateBox("PlayerSpaceShip", 3, this.scene);
-        this.spaceship.position.y = 3;
+        this.spaceship = new SpaceShip(this.scene, this.upLeftCorner, this.downRightCorner);
     }
 }    

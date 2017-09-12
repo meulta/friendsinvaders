@@ -10,7 +10,7 @@ export class Bullet {
     
     constructor(scene: BABYLON.Scene, initialPosition: BABYLON.Vector2, goingUp: boolean = false) {
         this.scene = scene;
-        this.goingUp = false;
+        this.goingUp = goingUp;
         this.initMesh(initialPosition);
         this.lastMoveTime = new Date(Date.now()).getTime() / 1000;
         this.move();        

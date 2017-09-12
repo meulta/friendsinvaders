@@ -79,8 +79,8 @@ export class HeadController {
                 if (happiness > 0.5 && happiness > anger) {
                     this._action = Action.Heal;
                 }
-                else if (happiness > 0.5 && happiness > anger) {
-                    this._action = Action.Heal;
+                else if (anger > 0.5 && happiness < anger) {
+                    this._action = Action.Shoot;
                 }
                 else {
                     this._action = Action.None;
