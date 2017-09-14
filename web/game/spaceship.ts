@@ -3,7 +3,7 @@ import { Bullet } from './bullet'
 import { Direction, Action } from '../types'
 
 export class SpaceShip {
-    private mesh: BABYLON.Mesh;
+    private _mesh: BABYLON.Mesh;
     private scene: BABYLON.Scene;
     private lastMoveTime: number;
     private _lastShootTime: number;
@@ -24,24 +24,24 @@ export class SpaceShip {
     }
 
     public get x(): number {
-        return this.mesh.position.x;
+        return this._mesh.position.x;
     }
     public set x(v: number) {
-        this.mesh.position.x = v;
+        this._mesh.position.x = v;
     }
 
     public get y(): number {
-        return this.mesh.position.y;
+        return this._mesh.position.y;
     }
     public set y(v: number) {
-        this.mesh.position.y = v;
+        this._mesh.position.y = v;
     }
 
     public get direction(): Direction {
         return this._direction;
     }
 
-    public set direction(v: Direction){
+    public set direction(v: Direction) {
         this._direction = v;
     }
 
@@ -49,8 +49,12 @@ export class SpaceShip {
         return this._action;
     }
 
-    public set action(v: Action){
+    public set action(v: Action) {
         this._action = v;
+    }
+
+    public get mesh(): BABYLON.Mesh {
+        return this._mesh;
     }
 
     public move(): void {
@@ -79,7 +83,44 @@ export class SpaceShip {
     }
 
     private initMesh(): void {
-        this.mesh = BABYLON.Mesh.CreateBox("PlayerSpaceShip", 3, this.scene);
-        this.y = 3;
+
+        var query = "https://api.remix3d.com/v3/creations/G009SX0MWZVH";
+
+        var req = new XMLHttpRequest();
+        var that = this;
+        req.addEventListener("load", function () {
+            var manifest = JSON.parse(this.responseText);
+
+            if (!manifest.manifestUris) {
+                console.warn("Unable to load G009SX0MWZVH");
+                return;
+            }
+
+            for (var index = 0; index < manifest.manifestUris.length; index++) {
+                var manifestUri = manifest.manifestUris[index];
+
+                // We want the viewable gltf
+                if (manifestUri.usage === "View") {
+                    var uri = manifestUri.uri;
+                    var fileIndex = uri.lastIndexOf("/");
+                    var path = uri.substring(0, fileIndex + 1);
+                    var filename = uri.substring(fileIndex + 1);
+
+                    // Let's import the model
+                    BABYLON.SceneLoader.ImportMesh("", path, filename, that.scene, function (meshes) {
+                        var mesh = meshes[0] as BABYLON.Mesh; 
+                        mesh.position = BABYLON.Vector3.Zero();
+                        console.log(`x: ${mesh.scaling.x}, y: ${mesh.scaling.y}, z: ${mesh.scaling.z}`);
+                        mesh.scaling = new BABYLON.Vector3(100,100,-100);
+                        that._mesh = mesh;
+                        that.y = 3;
+                    });
+                    return;
+                }
+            }
+        });
+        req.open("GET", query);
+        req.send();
+
     }
 }

@@ -2,7 +2,7 @@ import * as BABYLON from 'babylonjs'
 import { Bullet } from './bullet'
 
 export class Enemy {
-    private mesh: BABYLON.Mesh;
+    private _mesh: BABYLON.Mesh;
     private scene: BABYLON.Scene;
     private lastMoveTime: number;
     private moveLeft: boolean;
@@ -23,17 +23,21 @@ export class Enemy {
     }
 
     public get x(): number {
-        return this.mesh.position.x;
+        return this._mesh.position.x;
     }
     public set x(v: number) {
-        this.mesh.position.x = v;
+        this._mesh.position.x = v;
     }
 
     public get y(): number {
-        return this.mesh.position.y;
+        return this._mesh.position.y;
     }
     public set y(v: number) {
-        this.mesh.position.y = v;
+        this._mesh.position.y = v;
+    }
+
+    public get mesh(): BABYLON.Mesh {
+        return this._mesh;
     }
 
     public move(): void {
@@ -67,10 +71,51 @@ export class Enemy {
         return null;
     }
 
+    public kill(): void {
+        this.mesh.dispose();
+
+    }
+
     private initMesh(): void {
-        this.mesh = BABYLON.Mesh.CreateSphere('sphere1', 16, 3, this.scene);
-        this.y = 25;
-        this.x = Math.random() * this.downRightCorner.x * 2 - this.downRightCorner.x;
+
+        var query = "https://api.remix3d.com/v3/creations/G009SX0MWZ9F";
+
+        var req = new XMLHttpRequest();
+        var that = this;
+        req.addEventListener("load", function () {
+            var manifest = JSON.parse(this.responseText);
+
+            if (!manifest.manifestUris) {
+                console.warn("Unable to load G009SX0MWZ9F");
+                return;
+            }
+
+            for (var index = 0; index < manifest.manifestUris.length; index++) {
+                var manifestUri = manifest.manifestUris[index];
+
+                // We want the viewable gltf
+                if (manifestUri.usage === "View") {
+                    var uri = manifestUri.uri;
+                    var fileIndex = uri.lastIndexOf("/");
+                    var path = uri.substring(0, fileIndex + 1);
+                    var filename = uri.substring(fileIndex + 1);
+
+                    // Let's import the model
+                    BABYLON.SceneLoader.ImportMesh("", path, filename, that.scene, function (meshes) {
+                        var mesh = meshes[0] as BABYLON.Mesh;
+                        mesh.position = BABYLON.Vector3.Zero();
+                        mesh.scaling = new BABYLON.Vector3(1.5, 1.5, -1.5);
+                        that._mesh = mesh;
+                        that.y = 25;
+                        that.x = Math.random() * that.downRightCorner.x * 2 - that.downRightCorner.x;
+                        that.mesh.rotation = new BABYLON.Vector3(-Math.PI / 6, Math.PI * 2,  0);
+                    });
+                    return;
+                }
+            }
+        });
+        req.open("GET", query);
+        req.send();
     }
 
     private setNextDirection(): void {

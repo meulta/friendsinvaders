@@ -43,29 +43,67 @@ export class Game {
     public startRendering(): void {
         this.engine.runRenderLoop(() => {
             if (this.running) {
-                this.spaceship.direction = this.controller.direction;
-                this.spaceship.action = this.controller.action;
-                this.spaceship.move();
-                
-                var bullet = this.spaceship.tryShoot();
-                if (bullet != null) {
-                    this.bullets.push(bullet);
-                }
-                this.spaceship.tryShoot();
-                
-                this.enemies.forEach((enemy: Enemy) => {
-                    enemy.move();
-                    var bullet = enemy.tryShoot();
-                    if (bullet != null) {
-                        this.bullets.push(bullet);
-                    }
-                });
-
-                this.bullets.forEach((bullet: Bullet) => {
-                    bullet.move();
-                });
+                this.moveAll();
+                this.tryShootAll();
+                this.hitTest();
+                this.clean();
             }
             this.scene.render();
+        
+        });
+    }
+
+    private hitTest(): void {
+        this.bullets.forEach((bullet: Bullet) => {
+            this.enemies.forEach((enemy: Enemy, enemyIndex: number) => {
+                if(bullet.goingUp && bullet.mesh.intersectsMesh(enemy.mesh, false)){
+                    enemy.kill();
+                    bullet.destroy();
+                }
+            });
+        });
+    }
+
+    private clean(): void {
+        this.bullets.forEach((bullet: Bullet, index: number) => {
+            if(!bullet.mesh){
+                this.bullets.splice(index, 1);
+            }
+        });
+
+        this.enemies.forEach((enemy: Enemy, index: number) => {
+            if(!enemy.mesh){
+                this.enemies.splice(index, 1);
+            }
+        });
+    }
+
+    private moveAll(): void {
+        this.spaceship.direction = this.controller.direction;
+        this.spaceship.action = this.controller.action;
+        this.spaceship.move();
+
+        this.enemies.forEach((enemy: Enemy) => {
+            enemy.move();
+        });
+
+        this.bullets.forEach((bullet: Bullet) => {
+            bullet.move();
+        });
+    }
+
+    private tryShootAll(): void {
+        var bullet = this.spaceship.tryShoot();
+        if (bullet != null) {
+            this.bullets.push(bullet);
+        }
+        this.spaceship.tryShoot();
+
+        this.enemies.forEach((enemy: Enemy) => {
+            var bullet = enemy.tryShoot();
+            if (bullet != null) {
+                this.bullets.push(bullet);
+            }
         });
     }
 
@@ -79,20 +117,23 @@ export class Game {
         // target the camera to scene origin
         camera.setTarget(new BABYLON.Vector3(0, 15, 0));
 
+        camera.attachControl(this.canvas);
+
         // create a basic light, aiming 0,1,0 - meaning, to the sky
         var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), this.scene);
-    }
+        light.intensity = 4.5;
+        var hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("/artifacts/environment.dds", this.scene);
+        hdrTexture.gammaSpace = true;
+        this.scene.environmentTexture = hdrTexture;
+    } 
 
     private initGameVisuals() {
 
         //background
-        var spacebackground = BABYLON.Mesh.CreatePlane("spacebackground", 300, this.scene);
+        var spacebackground = BABYLON.Mesh.CreatePlane("spacebackground", 150, this.scene);
         spacebackground.material = new BABYLON.StandardMaterial("spacematerial", this.scene);
-        this.spacePT = new (<any>BABYLON).StarfieldProceduralTexture("spacebackgroundPT", 2048, this.scene);
-        (<BABYLON.StandardMaterial>spacebackground.material).diffuseTexture = this.spacePT;
-        this.spacePT.refreshRate = 0;
-        this.spacePT.time = Math.random() * 1000;
-        spacebackground.position.z = 40;
+        spacebackground.position.z = 50;
+        (<BABYLON.StandardMaterial>spacebackground.material).diffuseTexture = new BABYLON.Texture("/artifacts/space.png", this.scene);
 
         while (this.enemies.length < 5) {
             this.enemies.push(new Enemy(this.scene, this.upLeftCorner, this.downRightCorner));

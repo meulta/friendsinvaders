@@ -1,16 +1,16 @@
 import * as BABYLON from 'babylonjs'
 
 export class Bullet {
-    private mesh: BABYLON.Mesh;
+    private _mesh: BABYLON.Mesh;
     private scene: BABYLON.Scene;
     private lastMoveTime: number;
     private pace: number = 6;
-    private goingUp: boolean;
+    private _goingUp: boolean;
     private static originalMesh: BABYLON.Mesh;
     
     constructor(scene: BABYLON.Scene, initialPosition: BABYLON.Vector2, goingUp: boolean = false) {
         this.scene = scene;
-        this.goingUp = goingUp;
+        this._goingUp = goingUp;
         this.initMesh(initialPosition);
         this.lastMoveTime = new Date(Date.now()).getTime() / 1000;
         this.move();        
@@ -21,7 +21,7 @@ export class Bullet {
         var elapsedTime = currentTime - this.lastMoveTime;
         var distance = elapsedTime * this.pace;
         
-        if (this.goingUp) {
+        if (this._goingUp) {
             this.y += distance;
         }
         else {
@@ -32,17 +32,29 @@ export class Bullet {
     }
 
     public get x(): number {
-        return this.mesh.position.x;
+        return this._mesh.position.x;
     }
     public set x(v: number) {
-        this.mesh.position.x = v;
+        this._mesh.position.x = v;
     }
 
     public get y(): number {
-        return this.mesh.position.y;
+        return this._mesh.position.y;
     }
     public set y(v: number) {
-        this.mesh.position.y = v;
+        this._mesh.position.y = v;
+    }
+
+    public get mesh(): BABYLON.Mesh {
+        return this._mesh;
+    }
+
+    public destroy(): void{
+        this.mesh.dispose();
+    }
+
+    public get goingUp(): boolean {
+        return this._goingUp;
     }
 
     private initMesh(initialPosition: BABYLON.Vector2): void {
@@ -51,7 +63,7 @@ export class Bullet {
             Bullet.originalMesh.position.x = 1000;
         }
 
-        this.mesh = Bullet.originalMesh.clone("bullet");
+        this._mesh = Bullet.originalMesh.clone("bullet");
         this.x = initialPosition.x;
         this.y = initialPosition.y;
     }
