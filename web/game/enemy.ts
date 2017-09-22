@@ -1,5 +1,6 @@
 import * as BABYLON from 'babylonjs'
 import { Bullet } from './bullet'
+import { Utils } from './utils'
 
 export class Enemy {
     private _mesh: BABYLON.Mesh;
@@ -76,46 +77,11 @@ export class Enemy {
 
     }
 
-    private initMesh(): void {
-
-        var query = "https://api.remix3d.com/v3/creations/G009SX0MWZ9F";
-
-        var req = new XMLHttpRequest();
-        var that = this;
-        req.addEventListener("load", function () {
-            var manifest = JSON.parse(this.responseText);
-
-            if (!manifest.manifestUris) {
-                console.warn("Unable to load G009SX0MWZ9F");
-                return;
-            }
-
-            for (var index = 0; index < manifest.manifestUris.length; index++) {
-                var manifestUri = manifest.manifestUris[index];
-
-                // We want the viewable gltf
-                if (manifestUri.usage === "View") {
-                    var uri = manifestUri.uri;
-                    var fileIndex = uri.lastIndexOf("/");
-                    var path = uri.substring(0, fileIndex + 1);
-                    var filename = uri.substring(fileIndex + 1);
-
-                    // Let's import the model
-                    BABYLON.SceneLoader.ImportMesh("", path, filename, that.scene, function (meshes) {
-                        var mesh = meshes[0] as BABYLON.Mesh;
-                        mesh.position = BABYLON.Vector3.Zero();
-                        mesh.scaling = new BABYLON.Vector3(1.5, 1.5, -1.5);
-                        that._mesh = mesh;
-                        that.y = 25;
-                        that.x = Math.random() * that.downRightCorner.x * 2 - that.downRightCorner.x;
-                        that.mesh.rotation = new BABYLON.Vector3(-Math.PI / 6, Math.PI * 2,  0);
-                    });
-                    return;
-                }
-            }
-        });
-        req.open("GET", query);
-        req.send();
+    private async initMesh(): Promise<void> {
+        this._mesh = await Utils.downloadEnemy(this.scene);
+        this._mesh.position = new BABYLON.Vector3(Math.random() * this.downRightCorner.x * 2 - this.downRightCorner.x, 25, 0);
+        this._mesh.scaling = new BABYLON.Vector3(1.5, 1.5, -1.5);
+        this._mesh.rotation = new BABYLON.Vector3(-Math.PI / 6, Math.PI * 2, 0);
     }
 
     private setNextDirection(): void {

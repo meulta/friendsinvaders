@@ -20,7 +20,7 @@ export class App {
             this.game.stop();
         });
 
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
 
             var video: HTMLVideoElement = document.querySelector('#video') as HTMLVideoElement;
             var tempCanvas: HTMLCanvasElement = document.querySelector('#canvas') as HTMLCanvasElement;
@@ -30,6 +30,7 @@ export class App {
             var renderCanvas: HTMLCanvasElement = document.getElementById('renderCanvas') as HTMLCanvasElement;
 
             this.game = new Game(renderCanvas, controller);
+            await this.game.init();
         });
     }
 }

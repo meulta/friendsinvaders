@@ -28,6 +28,7 @@ export class HeadController {
     private pollingFrequencyInSec: number = 0.5;
     private streaming: boolean = false;
     private running: boolean = false;
+    private context: any = null;
 
     private _direction: Direction;
     public get direction(): Direction {
@@ -96,7 +97,10 @@ export class HeadController {
 
         return new Promise<FaceAttributes>(
             async (resolve) => {
-                this.tempCanvas.getContext('2d').drawImage(this.video, 0, 0, this.width, this.height);
+                if (!this.context) {
+                    this.context = this.tempCanvas.getContext('2d');
+                }
+                this.context.drawImage(this.video, 0, 0, this.width, this.height);
                 var faceResult = await FaceApi.detect(await this.toBlob(this.tempCanvas));
 
                 if (faceResult.length > 0) {

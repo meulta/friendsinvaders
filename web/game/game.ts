@@ -4,6 +4,7 @@ import { Direction, Action } from '../types'
 import { Enemy } from './enemy'
 import { Bullet } from './bullet'
 import { SpaceShip } from './spaceship'
+import { Utils } from './utils'
 
 export class Game {
 
@@ -25,9 +26,22 @@ export class Game {
         this.engine = new BABYLON.Engine(this.canvas, true);
         this.upLeftCorner = new BABYLON.Vector2(-28, 30);
         this.downRightCorner = new BABYLON.Vector2(28, 10);
-        this.createScene();
-        this.initGameVisuals();
-        this.startRendering();
+    }
+
+    public init(): Promise<void> {
+        return new Promise(async (resolve, reject) => {
+            this.createScene();
+            
+            var cacheEnemy = await Utils.downloadEnemy(this.scene);
+            var cacheSpaceship = await Utils.downloadSpaceship(this.scene);
+            cacheEnemy.position.y = 1000;
+            cacheSpaceship.position.y = 1000;
+
+            this.initGameVisuals();
+            this.startRendering();
+
+            resolve();
+        });
     }
 
     public start(): void {
@@ -49,14 +63,14 @@ export class Game {
                 this.clean();
             }
             this.scene.render();
-        
+
         });
     }
 
     private hitTest(): void {
         this.bullets.forEach((bullet: Bullet) => {
             this.enemies.forEach((enemy: Enemy, enemyIndex: number) => {
-                if(bullet.goingUp && bullet.mesh.intersectsMesh(enemy.mesh, false)){
+                if (bullet.goingUp && bullet.mesh.intersectsMesh(enemy.mesh, false)) {
                     enemy.kill();
                     bullet.destroy();
                 }
@@ -66,13 +80,13 @@ export class Game {
 
     private clean(): void {
         this.bullets.forEach((bullet: Bullet, index: number) => {
-            if(!bullet.mesh){
+            if (!bullet.mesh) {
                 this.bullets.splice(index, 1);
             }
         });
 
         this.enemies.forEach((enemy: Enemy, index: number) => {
-            if(!enemy.mesh){
+            if (!enemy.mesh) {
                 this.enemies.splice(index, 1);
             }
         });
@@ -117,20 +131,18 @@ export class Game {
         // target the camera to scene origin
         camera.setTarget(new BABYLON.Vector3(0, 15, 0));
 
-        camera.attachControl(this.canvas);
-
         // create a basic light, aiming 0,1,0 - meaning, to the sky
         var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), this.scene);
         light.intensity = 4.5;
         var hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("/artifacts/environment.dds", this.scene);
         hdrTexture.gammaSpace = true;
         this.scene.environmentTexture = hdrTexture;
-    } 
+    }
 
     private initGameVisuals() {
 
         //background
-        var spacebackground = BABYLON.Mesh.CreatePlane("spacebackground", 150, this.scene);
+        var spacebackground = BABYLON.Mesh.CreatePlane("spacebackground", 200, this.scene);
         spacebackground.material = new BABYLON.StandardMaterial("spacematerial", this.scene);
         spacebackground.position.z = 50;
         (<BABYLON.StandardMaterial>spacebackground.material).diffuseTexture = new BABYLON.Texture("/artifacts/space.png", this.scene);
