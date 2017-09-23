@@ -7,7 +7,7 @@ declare global {
     }
 
     interface Window {
-        webkitURL: any;
+        webkitURL: HTMLURL;
     }
 
     interface HTMLVideoElement {

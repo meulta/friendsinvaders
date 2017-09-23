@@ -16,7 +16,8 @@
     "@types/promise": "^7.1.30",
     "@types/superagent": "^3.5.5",
     "Promise": "^1.0.5",
-    "babylonjs": "^3.1.0-alpha1",
+    "babylonjs": "^3.1.0-alpha3.4",
+    "babylonjs-loaders": "^3.1.0-alpha3.4",
     "superagent": "^3.6.0"
   },
   "devDependencies": {
