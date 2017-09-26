@@ -86,6 +86,5 @@ export class SpaceShip {
     private async initMesh(): Promise<void> {
         this._mesh = await Utils.downloadSpaceship(this.scene);
         this._mesh.position = new BABYLON.Vector3(0, 3, 0);
-        this._mesh.scaling = new BABYLON.Vector3(100, 100, -100);
     }
 }
