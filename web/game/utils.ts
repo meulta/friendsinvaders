@@ -18,8 +18,9 @@ export class Utils {
                 resolve(Utils.spaceship);
             }
             else {
-                Utils.spaceship = await Utils.downloadAsset("G009SX0MWZVH", scene);
-                Utils.spaceship.scaling = new BABYLON.Vector3(400, 400, -400);
+                Utils.spaceship = await Utils.downloadAsset("spaceship.glb", scene);
+                Utils.spaceship.scaling = new BABYLON.Vector3(10, 10, -10);
+                resolve(Utils.spaceship);
             }
         });
     }
@@ -30,13 +31,13 @@ export class Utils {
                 resolve(Utils.spaceship);
             }
             else {
-                Utils.spaceship = await Utils.downloadAsset("G009SXHGCT31", scene);
+                Utils.spaceship = await Utils.downloadAsset("spaceshit.glb", scene);
                 Utils.poop = scene.getMeshByName('mesh_id36') as BABYLON.Mesh;
-                Utils.lips = scene.getMeshByName('mesh_id146') as BABYLON.Mesh;
-                Utils.lefteye = scene.getMeshByName('mesh_id163') as BABYLON.Mesh;
-                Utils.righteye = scene.getMeshByName('mesh_id164') as BABYLON.Mesh;
-                Utils.leftbro = scene.getMeshByName('mesh_id167') as BABYLON.Mesh;
-                Utils.rightbro = scene.getMeshByName('mesh_id166') as BABYLON.Mesh;
+                Utils.lips = scene.getMeshByName('mesh_id35') as BABYLON.Mesh;
+                Utils.lefteye = scene.getMeshByName('mesh_id30') as BABYLON.Mesh;
+                Utils.righteye = scene.getMeshByName('mesh_id31') as BABYLON.Mesh;
+                Utils.leftbro = scene.getMeshByName('mesh_id33') as BABYLON.Mesh;
+                Utils.rightbro = scene.getMeshByName('mesh_id32') as BABYLON.Mesh;
                 Utils.spaceship.rotation = new BABYLON.Vector3(0, (Math.PI * 2), 0);
                 Utils.spaceship.scaling = new BABYLON.Vector3(10, 100, 100);
                 resolve(Utils.spaceship);
@@ -46,11 +47,12 @@ export class Utils {
 
     public static downloadEnemy(scene: BABYLON.Scene): Promise<BABYLON.Mesh> {
         return new Promise(async (resolve, reject) => {
-            if (Utils.spaceship) {
+            if (Utils.enemy) {
                 resolve(Utils.enemy.clone(""));
             }
             else {
-                Utils.enemy = await Utils.downloadAsset("G009SX0MWZ9F", scene);
+                Utils.enemy = await Utils.downloadAsset("enemy.glb", scene);
+                Utils.enemy.scaling = new BABYLON.Vector3(4, 4, -4);
                 resolve(Utils.enemy);
             }
         });
@@ -59,36 +61,35 @@ export class Utils {
     public static downloadAsset(id: string, scene: BABYLON.Scene): Promise<BABYLON.Mesh> {
         return new Promise((resolve, reject) => {
 
-            var query = "https://api.remix3d.com/v3/creations/" + id;
+            var query = "../artifacts/";
+            // var req = new XMLHttpRequest();
+            // req.addEventListener("load", function () {
+            // var manifest = JSON.parse(this.responseText);
 
-            var req = new XMLHttpRequest();
-            req.addEventListener("load", function () {
-                var manifest = JSON.parse(this.responseText);
+            // if (!manifest.manifestUris) {
+            //     console.warn("Unable to load " + id);
+            //     return;
+            // }
 
-                if (!manifest.manifestUris) {
-                    console.warn("Unable to load " + id);
-                    return;
-                }
+            // for (var index = 0; index < manifest.manifestUris.length; index++) {
+            //     var manifestUri = manifest.manifestUris[index];
 
-                for (var index = 0; index < manifest.manifestUris.length; index++) {
-                    var manifestUri = manifest.manifestUris[index];
+            //     // We want the viewable gltf
+            //     if (manifestUri.usage === "View") {
+            //         var uri = manifestUri.uri;
+            //         var fileIndex = uri.lastIndexOf("/");
+            //         var path = uri.substring(0, fileIndex + 1);
+            //         var filename = uri.substring(fileIndex + 1);
 
-                    // We want the viewable gltf
-                    if (manifestUri.usage === "View") {
-                        var uri = manifestUri.uri;
-                        var fileIndex = uri.lastIndexOf("/");
-                        var path = uri.substring(0, fileIndex + 1);
-                        var filename = uri.substring(fileIndex + 1);
-
-                        // Let's import the model
-                        BABYLON.SceneLoader.ImportMesh("", path, filename, scene, function (meshes) {
-                            resolve(meshes[0] as BABYLON.Mesh);
-                        });
-                    }
-                }
+            // Let's import the model
+            BABYLON.SceneLoader.ImportMesh("", query, id, scene, function (meshes) {
+                resolve(meshes[0] as BABYLON.Mesh);
             });
-            req.open("GET", query);
-            req.send();
+            //}
+            // }
+            // });
+            // req.open("GET", query);
+            // req.send();
         });
     }
 

@@ -63,7 +63,6 @@ export class Game {
                 this.clean();
             }
             this.scene.render();
-
         });
     }
 

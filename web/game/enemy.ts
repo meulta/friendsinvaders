@@ -80,7 +80,6 @@ export class Enemy {
     private async initMesh(): Promise<void> {
         this._mesh = await Utils.downloadEnemy(this.scene);
         this._mesh.position = new BABYLON.Vector3(Math.random() * this.downRightCorner.x * 2 - this.downRightCorner.x, 25, 0);
-        this._mesh.scaling = new BABYLON.Vector3(1.5, 1.5, -1.5);
         this._mesh.rotation = new BABYLON.Vector3(-Math.PI / 6, Math.PI * 2, 0);
     }
 
