@@ -27,10 +27,11 @@ export class HeadTrackingInfo {
     rightEye: number[] = [0, 0];
     leftbro: number[] = [0, 0];
     rightbro: number[] = [0, 0];
+    upperLip: number[] = [0, 0];
+    lowerLip: number[] = [0, 0];
 }
 
 export class HeadController {
-
     private tempCanvas: HTMLCanvasElement;
     private video: HTMLVideoElement;
     private debug: HTMLParagraphElement;
@@ -43,6 +44,7 @@ export class HeadController {
     public roll: number = 0;
     public leftbroheight: number = 0;
     public rightbroheight: number = 0;
+    public lipsheight: number = 0;
     private headTrackingInfo: HeadTrackingInfo;
     private tracker: any;
 
@@ -84,9 +86,11 @@ export class HeadController {
             this.headTrackingInfo.rightEye = positions[27];
             this.headTrackingInfo.leftbro = positions[17];
             this.headTrackingInfo.rightbro = positions[21];
-            this.debug.innerText = 
-                "RightEye: [" + Math.round(positions[27][0]) + "," + Math.round(positions[27][1]) + 
-                "] LeftEye [" + Math.round(positions[32][0]) + "," + Math.round(positions[32][1]) + 
+            this.headTrackingInfo.upperLip = positions[60];
+            this.headTrackingInfo.lowerLip = positions[57];
+            this.debug.innerText =
+                "RightEye: [" + Math.round(positions[27][0]) + "," + Math.round(positions[27][1]) +
+                "] LeftEye [" + Math.round(positions[32][0]) + "," + Math.round(positions[32][1]) +
                 "] RightBro [" + Math.round(positions[21][0]) + "," + Math.round(positions[21][1]) +
                 "] Leftbro [" + Math.round(positions[17][0]) + "," + Math.round(positions[17][1]) + "]";
         }
@@ -103,8 +107,9 @@ export class HeadController {
             var roll = Math.atan2(deltaY, deltaX) * Math.PI / 3;
             this.roll = roll;
 
-            this.leftbroheight =  Utils.ComputeDistance(this.headTrackingInfo.leftbro[0], this.headTrackingInfo.leftbro[1], this.headTrackingInfo.leftEye[0], this.headTrackingInfo.leftEye[1]);
-            this.rightbroheight =  Utils.ComputeDistance(this.headTrackingInfo.rightbro[0], this.headTrackingInfo.rightbro[1], this.headTrackingInfo.rightEye[0], this.headTrackingInfo.rightEye[1]);
+            this.leftbroheight = Utils.ComputeDistance(this.headTrackingInfo.leftbro[0], this.headTrackingInfo.leftbro[1], this.headTrackingInfo.leftEye[0], this.headTrackingInfo.leftEye[1]);
+            this.rightbroheight = Utils.ComputeDistance(this.headTrackingInfo.rightbro[0], this.headTrackingInfo.rightbro[1], this.headTrackingInfo.rightEye[0], this.headTrackingInfo.rightEye[1]);
+            this.lipsheight = Utils.ComputeDistance(this.headTrackingInfo.upperLip[0], this.headTrackingInfo.upperLip[1], this.headTrackingInfo.lowerLip[0], this.headTrackingInfo.lowerLip[1]);
         }
         setTimeout(() => { this.headTracker(); }, this.pollingFrequencyInSec * 10);
     }

@@ -13,7 +13,7 @@ export class Morpher {
     private spaceship: BABYLON.Mesh;
     private running: boolean;
     private previousRoll: number = 0;
-    private t:number = 0;
+    private t: number = 0;
 
     constructor(canvas: HTMLCanvasElement, controller: HeadController) {
         this.canvas = canvas;
@@ -49,8 +49,6 @@ export class Morpher {
                 this.spaceship.position.y = 15;
                 this.spaceship.scaling = new BABYLON.Vector3(10, 10, -10);
             }
-            this.t += 0.03;
-            Utils.lips.scaling.y = 0.02 + 0.005 * Math.sin(this.t);
 
             if (this.running) {
                 this.moveAll();
@@ -66,9 +64,7 @@ export class Morpher {
         this.spaceship.rotateAround(new BABYLON.Vector3(0, 15, 0), new BABYLON.Vector3(0, 0, 1), this.controller.roll);
         Utils.leftbro.position.y = Utils.lefteye.position.y + this.controller.leftbroheight - 10;
         Utils.rightbro.position.y = Utils.righteye.position.y + this.controller.rightbroheight - 10;
-
-        console.log("leftheight : "+ this.controller.leftbroheight);
-        console.log("rightheight : "+ this.controller.rightbroheight);
+        Utils.lips.scaling.y = 0.2 + this.controller.lipsheight * 3;
     }
 
     private createScene() {
@@ -83,19 +79,17 @@ export class Morpher {
 
         // create a basic light, aiming 0,1,0 - meaning, to the sky
         var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), this.scene);
-        light.intensity = 4.5;
+        light.intensity = 0.7;
         var hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("/artifacts/environment.dds", this.scene);
         hdrTexture.gammaSpace = true;
         this.scene.environmentTexture = hdrTexture;
     }
 
     private initGameVisuals() {
-
         //background
         var spacebackground = BABYLON.Mesh.CreatePlane("spacebackground", 200, this.scene);
         spacebackground.material = new BABYLON.StandardMaterial("spacematerial", this.scene);
         spacebackground.position.z = 50;
         (<BABYLON.StandardMaterial>spacebackground.material).diffuseTexture = new BABYLON.Texture("/artifacts/space.png", this.scene);
-
     }
 }    

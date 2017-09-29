@@ -2,6 +2,7 @@ import * as BABYLON from 'babylonjs'
 import { Bullet } from './bullet'
 import { Direction, Action } from '../types'
 import { Utils } from './utils'
+import { Game } from './game'
 
 export class SpaceShip {
     private _mesh: BABYLON.Mesh;
@@ -85,6 +86,7 @@ export class SpaceShip {
 
     private async initMesh(): Promise<void> {
         this._mesh = await Utils.downloadSpaceship(this.scene);
-        this._mesh.position = new BABYLON.Vector3(0, 3, 0);
+        Game.shadowGenerator.getShadowMap().renderList.push(this._mesh);
+        this._mesh.position = new BABYLON.Vector3(0, 3, -3);
     }
 }

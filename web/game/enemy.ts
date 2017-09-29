@@ -1,6 +1,7 @@
 import * as BABYLON from 'babylonjs'
 import { Bullet } from './bullet'
 import { Utils } from './utils'
+import { Game } from './game'
 
 export class Enemy {
     private _mesh: BABYLON.Mesh;
@@ -74,12 +75,12 @@ export class Enemy {
 
     public kill(): void {
         this.mesh.dispose();
-
     }
 
     private async initMesh(): Promise<void> {
         this._mesh = await Utils.downloadEnemy(this.scene);
         this._mesh.position = new BABYLON.Vector3(Math.random() * this.downRightCorner.x * 2 - this.downRightCorner.x, 25, 0);
+        Game.shadowGenerator.getShadowMap().renderList.push(this._mesh);
         this._mesh.rotation = new BABYLON.Vector3(-Math.PI / 6, Math.PI * 2, 0);
     }
 

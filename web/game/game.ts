@@ -19,6 +19,7 @@ export class Game {
     private bullets: Bullet[] = [];
     private upLeftCorner: BABYLON.Vector2;
     private downRightCorner: BABYLON.Vector2;
+    public static shadowGenerator: BABYLON.ShadowGenerator;
 
     constructor(canvas: HTMLCanvasElement, controller: HeadController) {
         this.canvas = canvas;
@@ -31,7 +32,7 @@ export class Game {
     public init(): Promise<void> {
         return new Promise(async (resolve, reject) => {
             this.createScene();
-            
+
             var cacheEnemy = await Utils.downloadEnemy(this.scene);
             var cacheSpaceship = await Utils.downloadSpaceship(this.scene);
             cacheEnemy.position.y = 1000;
@@ -126,16 +127,22 @@ export class Game {
 
         // create a FreeCamera, and set its position to (x:0, y:5, z:-10)
         var camera = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 15, -40), this.scene);
-
+        camera.attachControl(this.canvas);
         // target the camera to scene origin
         camera.setTarget(new BABYLON.Vector3(0, 15, 0));
 
         // create a basic light, aiming 0,1,0 - meaning, to the sky
         var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), this.scene);
-        light.intensity = 4.5;
+        light.intensity = 1.5;
+        var light2 = new BABYLON.DirectionalLight("dir01", new BABYLON.Vector3(0, 0, 1), this.scene);
+        light2.position = new BABYLON.Vector3(0, 30, -30);
+        light2.intensity = 0.5;
         var hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("/artifacts/environment.dds", this.scene);
         hdrTexture.gammaSpace = true;
         this.scene.environmentTexture = hdrTexture;
+
+        // Shadows
+        Game.shadowGenerator = new BABYLON.ShadowGenerator(1024, light2);
     }
 
     private initGameVisuals() {
@@ -143,13 +150,14 @@ export class Game {
         //background
         var spacebackground = BABYLON.Mesh.CreatePlane("spacebackground", 200, this.scene);
         spacebackground.material = new BABYLON.StandardMaterial("spacematerial", this.scene);
-        spacebackground.position.z = 50;
+        spacebackground.position.z = 6;
         (<BABYLON.StandardMaterial>spacebackground.material).diffuseTexture = new BABYLON.Texture("/artifacts/space.png", this.scene);
-
+        spacebackground.receiveShadows = true;
         while (this.enemies.length < 5) {
             this.enemies.push(new Enemy(this.scene, this.upLeftCorner, this.downRightCorner));
         }
 
         this.spaceship = new SpaceShip(this.scene, this.upLeftCorner, this.downRightCorner);
+
     }
 }    

@@ -7,6 +7,7 @@ export class Bullet {
     private pace: number = 6;
     private _goingUp: boolean;
     private static originalMesh: BABYLON.Mesh;
+    private hl: BABYLON.HighlightLayer;
     
     constructor(scene: BABYLON.Scene, initialPosition: BABYLON.Vector2, goingUp: boolean = false) {
         this.scene = scene;
@@ -26,6 +27,10 @@ export class Bullet {
         }
         else {
             this.y -= distance;
+        }
+
+        if(this.y < 0){
+            this.destroy();
         }
         
         this.lastMoveTime = currentTime;
@@ -59,11 +64,20 @@ export class Bullet {
 
     private initMesh(initialPosition: BABYLON.Vector2): void {
         if(Bullet.originalMesh == null){
-            Bullet.originalMesh = BABYLON.Mesh.CreateSphere('box', 2, 1, this.scene);
+            Bullet.originalMesh = BABYLON.Mesh.CreateBox('box', 1, this.scene);
+            Bullet.originalMesh.scaling.x = 0.5;
+            Bullet.originalMesh.scaling.z = 0.5;
+            var material = new BABYLON.StandardMaterial("texture2", this.scene);
+            material.diffuseColor = new BABYLON.Color3(1, 0, 0); //Red
+            Bullet.originalMesh.material = material;
             Bullet.originalMesh.position.x = 1000;
         }
 
         this._mesh = Bullet.originalMesh.clone("bullet");
+        // if(!this.hl){
+        //     this.hl = new BABYLON.HighlightLayer("hl1", this.scene);
+        // }
+        // this.hl.addMesh(this._mesh , BABYLON.Color3.White());
         this.x = initialPosition.x;
         this.y = initialPosition.y;
     }
