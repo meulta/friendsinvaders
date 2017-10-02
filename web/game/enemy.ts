@@ -118,7 +118,7 @@ export class Enemy {
 
         // Where the particles come from
         var emitter = BABYLON.Mesh.CreateBox('asd', 0.01, this.scene);
-        emitter.parent = this._mesh;
+       // emitter.parent = this._mesh;
         emitter.position.z = 0.7;
         emitter.position.y -= 0.4;
         particleSystem.emitter = emitter; // the starting object, the emitter

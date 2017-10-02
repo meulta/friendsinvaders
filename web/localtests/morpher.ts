@@ -47,7 +47,9 @@ export class Morpher {
             if (this.spaceship.position.y != 15) {
                 this.spaceship.position.y = 15;
                 this.spaceship.position.z = 50;
-                Utils.lips.scaling.z = 5;
+                Utils.lips.scaling.z *= 0.7;
+                Utils.lips.scaling.y *= 0.7;
+                Utils.lips.scaling.x *= 0.7;
             }
 
             if (this.running) {
@@ -62,9 +64,9 @@ export class Morpher {
         this.spaceship.rotateAround(new BABYLON.Vector3(0, 15, 0), new BABYLON.Vector3(0, 0, 1), -this.previousRoll);
         this.previousRoll = this.controller.roll;
         this.spaceship.rotateAround(new BABYLON.Vector3(0, 15, 0), new BABYLON.Vector3(0, 0, 1), this.controller.roll);
-        Utils.leftbro.position.y = Utils.lefteye.position.y + this.controller.leftbroheight - 10;
-        Utils.rightbro.position.y = Utils.righteye.position.y + this.controller.rightbroheight - 10;
-        Utils.lips.scaling.y = 0.2 + this.controller.lipsheight * 3;
+        Utils.leftbro.position.y = Utils.lefteye.position.y + this.controller.leftbroheight - 12;
+        Utils.rightbro.position.y = Utils.righteye.position.y + this.controller.rightbroheight - 12;
+        Utils.lips.scaling.y = 0.0001 + this.controller.lipsheight * 0.0001;
     }
 
     private createScene() {

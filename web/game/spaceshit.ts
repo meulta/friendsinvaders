@@ -83,7 +83,7 @@ export class SpaceShit {
         this._mesh.rotateAround(rotationPoint, rotationAxis, this.roll);
         Utils.leftbro.position.y = Utils.lefteye.position.y + this.leftbroheight - 10;
         Utils.rightbro.position.y = Utils.righteye.position.y + this.rightbroheight - 10;
-        Utils.lips.scaling.y = 0.2 + this.lipsheight * 3;
+        Utils.lips.scaling.y = 0.0002 + this.lipsheight * 0.0002;
 
         this.lastMoveTime = currentTime;
     }
@@ -92,7 +92,7 @@ export class SpaceShit {
         var currentTime = new Date(Date.now()).getTime() / 500;
         if (this.action == Action.Shoot && currentTime > this._lastShootTime + this.shootIntervalInSec) {
             this._lastShootTime = currentTime;
-            return new Bullet(this.scene, new BABYLON.Vector2(this.x, this.y), true, true);
+            return new Bullet(this.scene, new BABYLON.Vector2(this.x, this.y), true, false);
         }
 
         return null;

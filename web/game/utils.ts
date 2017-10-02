@@ -48,16 +48,16 @@ export class Utils {
                 resolve(Utils.spaceshit);
             }
             else {
-                Utils.spaceshit = await Utils.downloadAsset("spaceshit.glb", scene);
-                Utils.poop = scene.getMeshByName('mesh_id36') as BABYLON.Mesh;
-                Utils.lips = scene.getMeshByName('mesh_id35') as BABYLON.Mesh;
-                Utils.lefteye = scene.getMeshByName('mesh_id30') as BABYLON.Mesh;
-                Utils.righteye = scene.getMeshByName('mesh_id31') as BABYLON.Mesh;
-                Utils.leftbro = scene.getMeshByName('mesh_id33') as BABYLON.Mesh;
-                Utils.rightbro = scene.getMeshByName('mesh_id32') as BABYLON.Mesh;
+                Utils.spaceshit = await Utils.downloadAsset("spaceshit2.glb", scene);
+                Utils.poop = scene.getMeshByName('mesh_id179') as BABYLON.Mesh;
+                Utils.lips = scene.getMeshByName('mesh_id305') as BABYLON.Mesh;
+                Utils.lefteye = scene.getMeshByName('mesh_id168') as BABYLON.Mesh;
+                Utils.righteye = scene.getMeshByName('mesh_id167') as BABYLON.Mesh;
+                Utils.leftbro = scene.getMeshByName('mesh_id164') as BABYLON.Mesh;
+                Utils.rightbro = scene.getMeshByName('mesh_id165') as BABYLON.Mesh;
                 Utils.spaceshit.rotation = new BABYLON.Vector3(0, (Math.PI * 2), 0);
                 Utils.spaceshit.scaling = new BABYLON.Vector3(50, 50, -50);
-                Utils.spaceshit.position.z = 0;
+                Utils.spaceshit.position.y = 0;
                 resolve(Utils.spaceshit);
             }
         });

@@ -64,10 +64,10 @@ export class Game {
     public startRendering(): void {
         this.engine.runRenderLoop(() => {
             if (this.running) {
-                this.moveAll();
+                this.clean();
                 this.tryShootAll();
                 this.hitTest();
-                this.clean();
+                this.moveAll();
             }
             this.scene.render();
         });
@@ -76,7 +76,7 @@ export class Game {
     private hitTest(): void {
         this.bullets.forEach((bullet: Bullet) => {
             this.enemies.forEach((enemy: Enemy, enemyIndex: number) => {
-                if (bullet.mesh && enemy.mesh && bullet.goingUp && bullet.mesh.intersectsMesh(enemy.mesh, true)) {
+                if (bullet.mesh && enemy.mesh && bullet.goingUp && bullet.mesh.intersectsMesh(enemy.mesh, false)) {
                     console.log('HIT');
                     enemy.kill();
                     bullet.destroy();

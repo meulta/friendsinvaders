@@ -61,7 +61,7 @@ export class Bullet {
     }
 
     public destroy(): void {
-        Bullet.hl.removeMesh(this._mesh);
+        //Bullet.hl.removeMesh(this._mesh);
         this.mesh.dispose();
         this._mesh = null;
     }
@@ -89,7 +89,6 @@ export class Bullet {
                 Bullet.originalMeshUp = Utils.corn;
                 Bullet.originalMeshUp.scaling.y *= 4;
                 Bullet.originalMeshUp.scaling.x *= 4;
-                Bullet.originalMeshUp.position.z += 1;
                 Bullet.originalMeshUp.position.x = 1000;
             }
             this._mesh = Bullet.originalMeshUp.clone("bullet");
@@ -106,10 +105,11 @@ export class Bullet {
             this._mesh = Bullet.originalMeshUp.clone("bullet");
         }
 
-        if (!Bullet.hl) {
-            Bullet.hl = new BABYLON.HighlightLayer("hl", this.scene, { mainTextureFixedSize: 512, blurHorizontalSize: 1, blurVerticalSize: 1 });
-        }
-        Bullet.hl.addMesh(this._mesh, BABYLON.Color3.White());
+        // if (!Bullet.hl) {
+        //     Bullet.hl = new BABYLON.HighlightLayer("hl", this.scene, { mainTextureFixedSize: 512, blurHorizontalSize: 1, blurVerticalSize: 1 });
+        // }
+        // Bullet.hl.addMesh(this._mesh, BABYLON.Color3.White());
+        this._mesh.position.z = 0.5;
         this.x = initialPosition.x;
         this.y = initialPosition.y;
     }
