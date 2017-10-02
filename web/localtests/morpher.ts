@@ -1,21 +1,22 @@
 import * as BABYLON from 'babylonjs'
-import { HeadController } from '../game/localHeadController'
+import { LocalHeadController } from '../game/localHeadController'
 import { Direction, Action } from '../types'
 import { SpaceShip } from '../game/spaceship'
 import { Utils } from '../game/utils'
+import { Game } from '../game/game'
 
 export class Morpher {
 
     private engine: BABYLON.Engine;
     private scene: BABYLON.Scene;
     private canvas: HTMLCanvasElement;
-    private controller: HeadController;
+    private controller: LocalHeadController;
     private spaceship: BABYLON.Mesh;
     private running: boolean;
     private previousRoll: number = 0;
     private t: number = 0;
 
-    constructor(canvas: HTMLCanvasElement, controller: HeadController) {
+    constructor(canvas: HTMLCanvasElement, controller: LocalHeadController) {
         this.canvas = canvas;
         this.controller = controller;
         this.engine = new BABYLON.Engine(this.canvas, true);
@@ -24,9 +25,7 @@ export class Morpher {
     public init(): Promise<void> {
         return new Promise(async (resolve, reject) => {
             this.createScene();
-
             this.spaceship = await Utils.downloadSpaceshit(this.scene);
-
             this.initGameVisuals();
             this.startRendering();
 
@@ -47,7 +46,8 @@ export class Morpher {
         this.engine.runRenderLoop(() => {
             if (this.spaceship.position.y != 15) {
                 this.spaceship.position.y = 15;
-                this.spaceship.scaling = new BABYLON.Vector3(10, 10, -10);
+                this.spaceship.position.z = 50;
+                Utils.lips.scaling.z = 5;
             }
 
             if (this.running) {
@@ -76,13 +76,24 @@ export class Morpher {
 
         // target the camera to scene origin
         camera.setTarget(new BABYLON.Vector3(0, 15, 0));
+        camera.attachControl(this.canvas);
 
         // create a basic light, aiming 0,1,0 - meaning, to the sky
         var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), this.scene);
-        light.intensity = 0.7;
+        light.intensity = 0.5;
         var hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("/artifacts/environment.dds", this.scene);
         hdrTexture.gammaSpace = true;
         this.scene.environmentTexture = hdrTexture;
+
+        var light2 = new BABYLON.DirectionalLight("dir01", new BABYLON.Vector3(-0.2, 0.2, 1), this.scene);
+        light2.position = new BABYLON.Vector3(0, 30, -120);
+        light2.intensity = 0.5;
+
+        // Shadows
+        Game.shadowGenerator = new BABYLON.ShadowGenerator(2048, light2);
+        Game.shadowGenerator.useExponentialShadowMap = true;
+        Game.shadowGenerator.useBlurExponentialShadowMap = true;
+        Game.shadowGenerator.blurScale = 10;
     }
 
     private initGameVisuals() {
@@ -90,6 +101,7 @@ export class Morpher {
         var spacebackground = BABYLON.Mesh.CreatePlane("spacebackground", 200, this.scene);
         spacebackground.material = new BABYLON.StandardMaterial("spacematerial", this.scene);
         spacebackground.position.z = 50;
+        spacebackground.receiveShadows = true;
         (<BABYLON.StandardMaterial>spacebackground.material).diffuseTexture = new BABYLON.Texture("/artifacts/space.png", this.scene);
     }
 }    

@@ -1,8 +1,11 @@
 import * as BABYLON from 'babylonjs'
+import { Game } from './game'
 
 export class Utils {
 
     public static spaceship: BABYLON.Mesh;
+    public static corn: BABYLON.Mesh;
+    public static spaceshit: BABYLON.Mesh;
     public static poopship: BABYLON.Mesh;
     public static poop: BABYLON.Mesh;
     public static lefteye: BABYLON.Mesh;
@@ -19,31 +22,43 @@ export class Utils {
             }
             else {
                 Utils.spaceship = await Utils.downloadAsset("spaceship.glb", scene);
-                //Utils.spaceship = BABYLON.Mesh.CreateBox("asda", 4, scene);
                 Utils.spaceship.scaling = new BABYLON.Vector3(10, 10, -10);
-                Utils.spaceship.position.z = -3;
-                Utils.spaceship.position.y = 15;
+                Utils.spaceship.renderingGroupId = 2;
                 resolve(Utils.spaceship);
+            }
+        });
+    }
+
+    public static downloadCorn(scene: BABYLON.Scene): Promise<BABYLON.Mesh> {
+        return new Promise(async (resolve, reject) => {
+            if (Utils.corn) {
+                resolve(Utils.corn.clone(""));
+            }
+            else {
+                Utils.corn = await Utils.downloadAsset("corn.glb", scene);
+                Utils.corn.scaling = new BABYLON.Vector3(2, 2, -2);
+                resolve(Utils.corn);
             }
         });
     }
 
     public static downloadSpaceshit(scene: BABYLON.Scene): Promise<BABYLON.Mesh> {
         return new Promise(async (resolve, reject) => {
-            if (Utils.spaceship) {
-                resolve(Utils.spaceship);
+            if (Utils.spaceshit) {
+                resolve(Utils.spaceshit);
             }
             else {
-                Utils.spaceship = await Utils.downloadAsset("spaceshit.glb", scene);
+                Utils.spaceshit = await Utils.downloadAsset("spaceshit.glb", scene);
                 Utils.poop = scene.getMeshByName('mesh_id36') as BABYLON.Mesh;
                 Utils.lips = scene.getMeshByName('mesh_id35') as BABYLON.Mesh;
                 Utils.lefteye = scene.getMeshByName('mesh_id30') as BABYLON.Mesh;
                 Utils.righteye = scene.getMeshByName('mesh_id31') as BABYLON.Mesh;
                 Utils.leftbro = scene.getMeshByName('mesh_id33') as BABYLON.Mesh;
                 Utils.rightbro = scene.getMeshByName('mesh_id32') as BABYLON.Mesh;
-                Utils.spaceship.rotation = new BABYLON.Vector3(0, (Math.PI * 2), 0);
-                Utils.spaceship.scaling = new BABYLON.Vector3(10, 100, 100);
-                resolve(Utils.spaceship);
+                Utils.spaceshit.rotation = new BABYLON.Vector3(0, (Math.PI * 2), 0);
+                Utils.spaceshit.scaling = new BABYLON.Vector3(50, 50, -50);
+                Utils.spaceshit.position.z = 0;
+                resolve(Utils.spaceshit);
             }
         });
     }
@@ -67,6 +82,12 @@ export class Utils {
 
             // Let's import the model
             BABYLON.SceneLoader.ImportMesh("", query, id, scene, function (meshes) {
+                if (id === "spaceship.glb") {
+                    meshes[0].getChildMeshes().forEach((mesh: BABYLON.Mesh) => {
+                        Game.shadowGenerator.getShadowMap().renderList.push(mesh);
+                    });
+                    Game.shadowGenerator.getShadowMap().renderList.push(meshes[0]);
+                }
                 resolve(meshes[0] as BABYLON.Mesh);
             });
         });

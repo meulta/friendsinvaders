@@ -31,7 +31,7 @@ export class HeadTrackingInfo {
     lowerLip: number[] = [0, 0];
 }
 
-export class HeadController {
+export class LocalHeadController {
     private tempCanvas: HTMLCanvasElement;
     private video: HTMLVideoElement;
     private debug: HTMLParagraphElement;
@@ -79,7 +79,7 @@ export class HeadController {
         this.running = false;
     }
 
-    private updateEyeInfo() {
+    private updateFaceInfo() {
         var positions = this.tracker.getCurrentPosition();
         if (positions) {
             this.headTrackingInfo.leftEye = positions[32];
@@ -101,7 +101,8 @@ export class HeadController {
 
     private headTracker() {
         if (this.running) {
-            this.updateEyeInfo();
+            this.updateFaceInfo();
+
             var deltaX = this.headTrackingInfo.leftEye[0] - this.headTrackingInfo.rightEye[0];
             var deltaY = this.headTrackingInfo.leftEye[1] - this.headTrackingInfo.rightEye[1];
             var roll = Math.atan2(deltaY, deltaX) * Math.PI / 3;
@@ -110,6 +111,16 @@ export class HeadController {
             this.leftbroheight = Utils.ComputeDistance(this.headTrackingInfo.leftbro[0], this.headTrackingInfo.leftbro[1], this.headTrackingInfo.leftEye[0], this.headTrackingInfo.leftEye[1]);
             this.rightbroheight = Utils.ComputeDistance(this.headTrackingInfo.rightbro[0], this.headTrackingInfo.rightbro[1], this.headTrackingInfo.rightEye[0], this.headTrackingInfo.rightEye[1]);
             this.lipsheight = Utils.ComputeDistance(this.headTrackingInfo.upperLip[0], this.headTrackingInfo.upperLip[1], this.headTrackingInfo.lowerLip[0], this.headTrackingInfo.lowerLip[1]);
+            
+            if (roll > 0.1) {
+                this._direction = Direction.Left;
+            }
+            else if (roll < -0.1) {
+                this._direction = Direction.Right;
+            }
+            else {
+                this._direction = Direction.None;
+            }
         }
         setTimeout(() => { this.headTracker(); }, this.pollingFrequencyInSec * 10);
     }

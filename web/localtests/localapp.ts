@@ -1,4 +1,4 @@
-import { HeadController } from '../game/localHeadController'
+import { LocalHeadController } from '../game/localHeadController'
 import { Morpher } from './morpher'
 import { denodeify } from 'promise'
 
@@ -25,7 +25,7 @@ export class App {
             var video: HTMLVideoElement = document.querySelector('#video') as HTMLVideoElement;
             var tempCanvas: HTMLCanvasElement = document.querySelector('#canvas') as HTMLCanvasElement;
             var debug: HTMLParagraphElement = document.querySelector('#debug') as HTMLParagraphElement;
-            var controller = new HeadController(video, tempCanvas, debug);
+            var controller = new LocalHeadController(video, tempCanvas, debug);
 
             var renderCanvas: HTMLCanvasElement = document.getElementById('renderCanvas') as HTMLCanvasElement;
 

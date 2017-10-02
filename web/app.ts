@@ -1,4 +1,5 @@
 import { HeadController } from './game/headController'
+import { LocalHeadController } from './game/localHeadController'
 import { denodeify } from 'promise'
 import { Game } from './game/game'
 
@@ -21,11 +22,10 @@ export class App {
         });
 
         window.addEventListener('DOMContentLoaded', async () => {
-
             var video: HTMLVideoElement = document.querySelector('#video') as HTMLVideoElement;
             var tempCanvas: HTMLCanvasElement = document.querySelector('#canvas') as HTMLCanvasElement;
             var debug: HTMLParagraphElement = document.querySelector('#debug') as HTMLParagraphElement;
-            var controller = new HeadController(video, tempCanvas, debug);
+            var controller = new LocalHeadController(video, tempCanvas, debug);
 
             var renderCanvas: HTMLCanvasElement = document.getElementById('renderCanvas') as HTMLCanvasElement;
 
