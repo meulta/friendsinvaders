@@ -89,10 +89,10 @@ export class SpaceShit {
     }
 
     public tryShoot(): Bullet {
-        var currentTime = new Date(Date.now()).getTime() / 1000;
+        var currentTime = new Date(Date.now()).getTime() / 500;
         if (this.action == Action.Shoot && currentTime > this._lastShootTime + this.shootIntervalInSec) {
             this._lastShootTime = currentTime;
-            return new Bullet(this.scene, new BABYLON.Vector2(this.x, this.y), true);
+            return new Bullet(this.scene, new BABYLON.Vector2(this.x, this.y), true, true);
         }
 
         return null;
@@ -123,10 +123,10 @@ export class SpaceShit {
         particleSystem.maxEmitBox = new BABYLON.Vector3(0.12, 0, 0); // To...
 
         // Colors of all particles
-        particleSystem.color1 = new BABYLON.Color4(139/255, 69/255, 19/255, 1.0);
+        particleSystem.color1 = new BABYLON.Color4(139 / 255, 69 / 255, 19 / 255, 1.0);
         particleSystem.color2 = particleSystem.color1;
-        particleSystem.colorDead = new BABYLON.Color4(128/255, 0/255, 0/255, 0.0);
-        particleSystem.textureMask = new BABYLON.Color4(128/255, 0/255, 0/255, 1.0);
+        particleSystem.colorDead = new BABYLON.Color4(128 / 255, 0 / 255, 0 / 255, 0.0);
+        particleSystem.textureMask = new BABYLON.Color4(128 / 255, 0 / 255, 0 / 255, 1.0);
 
         // Size of each particle (random between...
         particleSystem.minSize = 0.3;

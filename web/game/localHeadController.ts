@@ -121,31 +121,16 @@ export class LocalHeadController {
             else {
                 this._direction = Direction.None;
             }
+
+            if (this.leftbroheight > 12){
+                this._action = Action.Shoot;
+            }
+            else {
+                this._action = Action.None;
+            }
+
         }
-        setTimeout(() => { this.headTracker(); }, this.pollingFrequencyInSec * 10);
-    }
-
-    private async getFaceAttributes(): Promise<FaceAttributes> {
-        this.tempCanvas.width = this.width;
-        this.tempCanvas.height = this.height;
-
-        return new Promise<FaceAttributes>(
-            async (resolve) => {
-                if (!this.context) {
-                    this.context = this.tempCanvas.getContext('2d');
-                }
-                this.context.drawImage(this.video, 0, 0, this.width, this.height);
-                var faceResult = await FaceApi.detect(await this.toBlob(this.tempCanvas));
-
-                if (faceResult.length > 0) {
-                    var attr = faceResult[0].faceAttributes;
-                    this.debug.innerText = `Pitch: ${attr.headPose.pitch}, Roll: ${attr.headPose.roll}, Yaw: ${attr.headPose.yaw}, Anger: ${attr.emotion.anger}, Happiness: ${attr.emotion.happiness}, Neutral: ${attr.emotion.neutral}, Smile: ${attr.smile}, Age: ${attr.age}`;
-                    resolve(attr);
-                } else {
-                    this.debug.innerText = 'No face detected';
-                    resolve(null);
-                }
-            });
+        setTimeout(() => { this.headTracker(); }, this.pollingFrequencyInSec * 100);
     }
 
     private init() {

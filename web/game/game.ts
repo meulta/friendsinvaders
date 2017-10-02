@@ -76,7 +76,6 @@ export class Game {
     private hitTest(): void {
         this.bullets.forEach((bullet: Bullet) => {
             this.enemies.forEach((enemy: Enemy, enemyIndex: number) => {
-                console.log(bullet.mesh);
                 if (bullet.mesh && enemy.mesh && bullet.goingUp && bullet.mesh.intersectsMesh(enemy.mesh, true)) {
                     console.log('HIT');
                     enemy.kill();

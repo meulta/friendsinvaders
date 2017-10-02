@@ -86,7 +86,7 @@ export class Bullet {
         }
         else if (this._isCorn) {
             if (Bullet.originalMeshUp == null) {
-                Bullet.originalMeshUp = await Utils.downloadCorn(this.scene);
+                Bullet.originalMeshUp = Utils.corn;
                 Bullet.originalMeshUp.scaling.y *= 4;
                 Bullet.originalMeshUp.scaling.x *= 4;
                 Bullet.originalMeshUp.position.z += 1;
