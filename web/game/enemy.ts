@@ -67,7 +67,7 @@ export class Enemy {
 
     public tryShoot(): Bullet {
         if (Math.random() < 0.01) {
-            //return new Bullet(this.scene, new BABYLON.Vector2(this.x, this.y));
+            return new Bullet(this.scene, new BABYLON.Vector2(this.x, this.y));
         }
 
         return null;

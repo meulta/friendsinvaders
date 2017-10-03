@@ -61,7 +61,7 @@ export class Bullet {
     }
 
     public destroy(): void {
-        //Bullet.hl.removeMesh(this._mesh);
+        Bullet.hl.removeMesh(this._mesh);
         this.mesh.dispose();
         this._mesh = null;
     }
@@ -76,7 +76,7 @@ export class Bullet {
             if (Bullet.originalMeshDown == null) {
                 Bullet.originalMeshDown = BABYLON.Mesh.CreateBox('box', 1.5, this.scene);
                 Bullet.originalMeshDown.scaling.x = 0.20;
-                Bullet.originalMeshDown.scaling.z = 0.10;
+                Bullet.originalMeshDown.scaling.z = 0.20;
                 Bullet.originalMeshDown.position.x = 1000;
                 var material = new BABYLON.StandardMaterial("texture2", this.scene);
                 material.diffuseColor = new BABYLON.Color3(1, 0, 0); //Red
@@ -97,6 +97,7 @@ export class Bullet {
             if (Bullet.originalMeshUp == null) {
                 Bullet.originalMeshUp = BABYLON.Mesh.CreateBox('box', 1.5, this.scene);
                 Bullet.originalMeshUp.scaling.x = 0.20;
+                Bullet.originalMeshUp.scaling.z = 0.20;
                 Bullet.originalMeshUp.position.x = 1000;
                 var material = new BABYLON.StandardMaterial("texture2", this.scene);
                 material.diffuseColor = new BABYLON.Color3(0, 1, 0);
@@ -105,10 +106,10 @@ export class Bullet {
             this._mesh = Bullet.originalMeshUp.clone("bullet");
         }
 
-        // if (!Bullet.hl) {
-        //     Bullet.hl = new BABYLON.HighlightLayer("hl", this.scene, { mainTextureFixedSize: 512, blurHorizontalSize: 1, blurVerticalSize: 1 });
-        // }
-        // Bullet.hl.addMesh(this._mesh, BABYLON.Color3.White());
+        if (!Bullet.hl) {
+            Bullet.hl = new BABYLON.HighlightLayer("hl", this.scene, { mainTextureFixedSize: 512, blurHorizontalSize: 1, blurVerticalSize: 1 });
+        }
+        Bullet.hl.addMesh(this._mesh, BABYLON.Color3.White());
         this._mesh.position.z = 0.5;
         this.x = initialPosition.x;
         this.y = initialPosition.y;
