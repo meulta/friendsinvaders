@@ -79,7 +79,7 @@ export class Bullet {
                 Bullet.originalMeshDown.scaling.z = 0.20;
                 Bullet.originalMeshDown.position.x = 1000;
                 var material = new BABYLON.StandardMaterial("texture2", this.scene);
-                material.diffuseColor = new BABYLON.Color3(1, 0, 0); //Red
+                material.diffuseColor = new BABYLON.Color3(1, 0, 0); 
                 Bullet.originalMeshDown.material = material;
             }
             this._mesh = Bullet.originalMeshDown.clone("bullet");

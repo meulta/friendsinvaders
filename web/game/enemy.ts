@@ -13,6 +13,7 @@ export class Enemy {
     private moveDown: boolean;
     private upLeftCorner: BABYLON.Vector2;
     private downRightCorner: BABYLON.Vector2;
+    public static pictureList: any[];
     private pace: number = 4;
 
     constructor(scene: BABYLON.Scene, upLeftCorner: BABYLON.Vector2, downRightCorner: BABYLON.Vector2) {
@@ -81,9 +82,9 @@ export class Enemy {
     private async initMesh(): Promise<void> {
         this._mesh = await Utils.downloadEnemy(this.scene);
         this._mesh.position = new BABYLON.Vector3(Math.random() * this.downRightCorner.x * 2 - this.downRightCorner.x, 25, 2);
-        Game.shadowGenerator.getShadowMap().renderList.push(this._mesh);
         this._mesh.rotation = new BABYLON.Vector3(-Math.PI / 6, Math.PI * 2, 0);
         this.addParticles();
+
     }
 
     private setNextDirection(): void {
@@ -118,7 +119,7 @@ export class Enemy {
 
         // Where the particles come from
         var emitter = BABYLON.Mesh.CreateBox('asd', 0.01, this.scene);
-       // emitter.parent = this._mesh;
+        emitter.parent = this._mesh;
         emitter.position.z = 0.7;
         emitter.position.y -= 0.4;
         particleSystem.emitter = emitter; // the starting object, the emitter

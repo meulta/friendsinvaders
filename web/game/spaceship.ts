@@ -84,9 +84,14 @@ export class SpaceShip {
         return null;
     }
 
+    public hit() {
+        this.mesh.scaling.x *= 0.9;
+        this.mesh.scaling.y *= 0.9;
+        this.mesh.scaling.z *= 0.9;
+    }
+
     private async initMesh(): Promise<void> {
         this._mesh = await Utils.downloadSpaceship(this.scene);
-        Game.shadowGenerator.getShadowMap().renderList.push(this._mesh);
         this._mesh.position = new BABYLON.Vector3(0, 3, -3);
         this.addParticles();
     }

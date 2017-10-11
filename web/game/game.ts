@@ -7,6 +7,7 @@ import { SpaceShip } from './spaceship'
 import { SpaceShit } from './spaceshit'
 import { LocalHeadController } from './localHeadController'
 import { Utils } from './utils'
+import { Enemouche } from './enemouche'
 
 export class Game {
 
@@ -21,6 +22,7 @@ export class Game {
     private bullets: Bullet[] = [];
     private upLeftCorner: BABYLON.Vector2;
     private downRightCorner: BABYLON.Vector2;
+    private friendsImg: HTMLImageElement;
     public static shadowGenerator: BABYLON.ShadowGenerator;
 
     constructor(canvas: HTMLCanvasElement, controller: HeadController | LocalHeadController) {
@@ -31,18 +33,23 @@ export class Game {
         this.downRightCorner = new BABYLON.Vector2(28, 10);
     }
 
-    public init(): Promise<void> {
+    public init(imgInput: HTMLImageElement = null): Promise<void> {
         return new Promise(async (resolve, reject) => {
             this.createScene();
+
+            if(imgInput)
+                await Utils.loadFriends(this.scene, imgInput);
 
             var cacheEnemy = await Utils.downloadEnemy(this.scene);
             var cacheSpaceship = await Utils.downloadSpaceship(this.scene);
             var cacheSpaceshit = await Utils.downloadSpaceshit(this.scene);
             var cacheCorn = await Utils.downloadCorn(this.scene);
+            var cacheEnemouche = await Utils.downloadEnemouche(this.scene);
             cacheEnemy.position.y = 1000;
             cacheSpaceship.position.y = 1000;
             cacheSpaceshit.position.y = 1000;
             cacheCorn.position.y = 1000;
+            cacheEnemouche.position.y = 1000;
 
             this.initGameVisuals();
             this.startRendering();
@@ -75,12 +82,11 @@ export class Game {
 
     private hitTest(): void {
         this.bullets.forEach((bullet: Bullet) => {
-            this.enemies.forEach((enemy: Enemy, enemyIndex: number) => {
+            this.enemies.forEach((enemy: Enemy | Enemouche, enemyIndex: number) => {
                 if (enemy.mesh) {
                     var meshes = enemy.mesh.getChildMeshes();
                     for (var i = 0; i < meshes.length; i++) {
                         if (bullet.mesh && bullet.goingUp && bullet.mesh.intersectsMesh(meshes[i], false)) {
-                            console.log('HIT');
                             enemy.kill();
                             bullet.destroy();
                             break;
@@ -88,6 +94,15 @@ export class Game {
                     }
                 }
             });
+
+            var meshes = this.spaceship.mesh.getChildMeshes();
+            for (var i = 0; i < meshes.length; i++) {
+                if (bullet.mesh && !bullet.goingUp && bullet.mesh.intersectsMesh(meshes[i], false)) {
+                    this.spaceship.hit();
+                    bullet.destroy();
+                    break;
+                }
+            }
         });
     }
 
@@ -95,14 +110,12 @@ export class Game {
         this.bullets.forEach((bullet: Bullet, index: number) => {
             if (!bullet.mesh) {
                 this.bullets.splice(index, 1);
-                console.log('delete bullet');
             }
         });
 
-        this.enemies.forEach((enemy: Enemy, index: number) => {
+        this.enemies.forEach((enemy: Enemy | Enemouche, index: number) => {
             if (!enemy.mesh) {
                 this.enemies.splice(index, 1);
-                console.log('delete enemy');
             }
         });
     }
@@ -118,7 +131,7 @@ export class Game {
         }
         this.spaceship.move();
 
-        this.enemies.forEach((enemy: Enemy) => {
+        this.enemies.forEach((enemy: Enemy | Enemouche) => {
             enemy.move();
         });
 
@@ -133,7 +146,7 @@ export class Game {
             this.bullets.push(bullet);
         }
 
-        this.enemies.forEach((enemy: Enemy) => {
+        this.enemies.forEach((enemy: Enemy | Enemouche) => {
             var bullet = enemy.tryShoot();
             if (bullet != null) {
                 this.bullets.push(bullet);
@@ -155,9 +168,11 @@ export class Game {
         // create a basic light, aiming 0,1,0 - meaning, to the sky
         var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), this.scene);
         light.intensity = 1.5;
-        var light2 = new BABYLON.DirectionalLight("dir01", new BABYLON.Vector3(-0.2, -0.2, 1), this.scene);
-        light2.position = new BABYLON.Vector3(0, 15, -2);
+
+        var light2 = new BABYLON.DirectionalLight("dir01", new BABYLON.Vector3(-0.1, 0, 1), this.scene);
+        light2.position = new BABYLON.Vector3(0, 15, -15);
         light2.intensity = 0.5;
+
         var hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("/artifacts/environment.dds", this.scene);
         hdrTexture.gammaSpace = true;
         this.scene.environmentTexture = hdrTexture;
@@ -176,7 +191,7 @@ export class Game {
         spacebackground.receiveShadows = true;
 
         while (this.enemies.length < 5) {
-            this.enemies.push(new Enemy(this.scene, this.upLeftCorner, this.downRightCorner));
+            this.enemies.push(new Enemouche(this.scene, this.upLeftCorner, this.downRightCorner) as any);
         }
 
         this.spaceship = new SpaceShit(this.scene, this.upLeftCorner, this.downRightCorner);

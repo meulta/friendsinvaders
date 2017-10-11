@@ -92,17 +92,26 @@ export class SpaceShit {
         var currentTime = new Date(Date.now()).getTime() / 500;
         if (this.action == Action.Shoot && currentTime > this._lastShootTime + this.shootIntervalInSec) {
             this._lastShootTime = currentTime;
-            return new Bullet(this.scene, new BABYLON.Vector2(this.x, this.y), true, false);
+            return new Bullet(this.scene, new BABYLON.Vector2(this.x, this.y), true, true);
         }
 
         return null;
     }
 
+    public hit() {
+        this.mesh.scaling.x *= 0.9;
+        this.mesh.scaling.y *= 0.9;
+        this.mesh.scaling.z *= 0.9;
+        Utils.corn.scaling.x *= 0.9
+        Utils.corn.scaling.y *= 0.9
+        Utils.corn.scaling.z *= 0.9
+    }
+
     private async initMesh(): Promise<void> {
         this._mesh = await Utils.downloadSpaceshit(this.scene);
-        Game.shadowGenerator.getShadowMap().renderList.push(this._mesh);
-        this._mesh.position = new BABYLON.Vector3(0, 8, -3);
+        this._mesh.position = new BABYLON.Vector3(0, 6, 4);
         this._mesh.scaling = new BABYLON.Vector3(10, 10, -10);
+        Utils.addToShadowGenerator(this._mesh);
         this.addParticles();
     }
 
